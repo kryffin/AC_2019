@@ -40,87 +40,96 @@ si l'algo aboutit à une contradiction, l'algo envoie NON
 """
 import sys
 import numpy as np
+import printing
+
 
 argv = sys.argv
 if(len(argv)!=2):
 	print "\nusage : python 32SSS.py nombreDeVariable\n"
-	sys.exit
+	sys.exit()
 
 #on recupere le nombre de variable
 N = int(argv[1]) 
 
-print "there is", N , "variables\n"
-##déclaration des variables globales##
-unaire = np.array([[False] *3 for _ in range(N)])
-print "array of", unaire.ndim ,"created"
+var = np.array([True] * N) #1 dimension
+print "array of ", N , "variables created"
+
+##TABLEAU UNAIRE GLOBAL##
+unaire = np.array([[False] *3 for _ in range(N)]) #2 dimensions
+print "array of", unaire.ndim ,"dimensions created for unary constraint"
+#unaire[0][1] = True  ==> x0 = V
+
+##TABLEAU BINAIRE GLOBAL##
 binaire = np.array(
 	[#1st layer
-		[[[False]*3 for _ in range(3)]]*N for _ in range(N) 
-	])
-
-
-print "array of", binaire.ndim, "created"
+		[[[False]*3 for _ in range(3)]]*N for _ in range(N) #2nd layer continent une matrice pour chaque case
+	]) #4 dimensions
+print "array of", binaire.ndim, "dimensions created for binary constraint"
 
 def init():
 	#print unaire
 	pass
 
 
-def printUnaire():
-	print "====printing unaire=====\n"
-	for i in range(0,N):
-		print "x",i
-		for j in range(3):
-			print unaire[i][j]
-		print "\n"
+def cas1():
+	global N #on recupere la variable globale N
+	global unaire 
+	global var
+	#cas 1 : une variable x apparait dans trois contraintes unaire différentes
+	#[(x,R)],[(x,V)] et [(x,B)]
+	for i in range (0,N):
+		if(var[i]==True):#si on doit process la variable
+			if (unaire[i][0]==unaire[i][1] and 
+			unaire[i][1]==unaire[i][2] and 
+			unaire[i][2]==True): #si il a trois contraintes unaire de x
+				return False #on repond non
+	return True#on repond oui 
 
-def printBinaire():
-	"""
-		affichage explication : 
-		binaire[x1][x2][COLOR1][COLOR2]
-		
-		(x**1**, x**2**)
-						  COLOR2
-					   		|
-					   		v
-				0	 1	    2  
-		  0	[[True False False]
-COLOR1--> 1	[False False **True**]
-		  2	[False False False]]  
+def cas2():
+	global N #on recupere la variable globale N
+	global unaire
+	global binaire 
+	global var
+
+	for i in range (0,N):
+		if(var[i]==True):
+			b1 = (unaire[i][1]==unaire[i][2] and unaire[i][1] == True) #xi,G | xi,B
+			b2 = (unaire[i][0]==unaire[i][1] and unaire[i][0] == True) #xi,R | xi,G 
+			b3 = (unaire[i][0]==unaire[i][2] and unaire[i][0] == True) #xi,R | xi,B
+
+			if(b1 or b2 or b3): #si x_i apparait dans deux contraintes unaires
+			for f in range (0,N): #pour toutes les variables dont le couples s'associe avec xi
+				for col_x in range(0,3): #les couleurs de X {R,G,B}
+					for col_f in range(0,3): #les couleurs f {R,G,B}
+						if(binaire[f][i][col_f][col_x] or binaire[i][f][col_x][col_f])#si une contrainte binaire existe contenant xi 
+							binaire[f][i][col_f][col_x] = False #on supprime les contraintes de type [(y,{R,G,B}), (x_i,{R,G,B})]
+							binaire[i][f][col_x][col_f] = False #on supprime les contraintes de type [(x_i,{R,G,B}), (y,{R,G,B})]
+							binaire[f][col_f] = True #on ajoute la contrainte unaire [y,{R,G,B}]
+				
+
 			
-		pour binaire[1][2][1][2]
-
-		revient à la TDV
-		x1 x2	isSet
-		R  R    True
-		R  V    False
-		R  B    False
-		V  R    False
-		V  V    False
-		V  B    True
-		B  R    False
-		B  V    False
-		B  B    False
-	"""
-	print "====printing binaire=====\n"
-
-	for i in range(N):
-		for j in range(N):
-			print "(x",i,"x",j,")"
-			print binaire[i,j]
-			print"\n"
 
 
+def process():
+	stop = cas1()
+	if(not stop):
+		cas2()
 
 def main():
 	global unaire
 	global binaire
-	#printUnaire()
-	unaire[0][1] = True
+	#printUnaire(N, unaire)
+	unaire[2][0] = True #x2 = R
+	unaire[2][1] = True #x2 = G
+	unaire[2][2] = True #x2 = B
 	#printUnaire()
 	binaire[1][2][1][2] = True #x1 = V, x2 = B
-	printBinaire()
+	#printing.printBinaire(N, binaire)
+	print "initialisation...."
 	init()
+	print "done\n\nprocessing......"
+	process()
+	print "done"
 
 if __name__ == "__main__":
     # execute only if run as a script
