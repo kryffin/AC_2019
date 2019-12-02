@@ -3,10 +3,11 @@
 def printUnaire(N, unaire):
 	print "====printing unaire=====\n"
 	for i in range(0,N):
-		print "x",i
 		for j in range(3):
-			print unaire[i][j]
-		print "\n"
+			if(unaire[i][j]):
+				print "x",i , "col,", j
+				print unaire[i][j]
+
 
 def printBinaire(N, binaire):
 	"""
@@ -41,6 +42,47 @@ COLOR1--> 1	[False False **True**]
 	for i in range(N):
 		for j in range(N):
 			print "(x",i,"x",j,")"
-			print binaire[i,j]
-			print"\n"
+			res = False
+			for c1 in range (0, 3):
+				for c2 in range (0, 3):
+					if(binaire[i][j][c1][c2]):
+						res = res or True
+			if(res):
+				print binaire[i,j]
+			
 
+
+def init_default1(N, unaire, binaire, var):
+	"""
+	[(x0,R)], [(x0,B)],
+	[(x0,B),(x1,R)], 
+	[(x0,R),(x2,B)],
+	[(x0,V),(x2,V)], 
+	[(x0,B),(x4,R)],
+	[(x0,V),(x4,B)], 
+	[(x0,B),(x4,V)],
+	[(x2,V),(x3,V)], 
+	[(x2,B),(x4,R)]
+	"""
+	unaire[0][0] = True
+	unaire[0][2] = True
+	binaire[0][1][2][0] = True
+	binaire[0][2][0][2] = True
+	binaire[0][2][1][1] = True
+	binaire[0][4][2][0] = True
+	binaire[0][4][1][2] = True
+	binaire[0][4][2][1] = True
+	binaire[2][3][1][1] = True
+	binaire[2][4][2][0] = True
+
+
+"""
+	##output cas 2 :
+	[(x1,R)], [(x1,B)],
+	[(x2,R)], [(x3,B)], 
+	[(x3,V)], [(x5,R)],
+	[(x5,B)], [(x5,V)], 
+	[(x3,V),(x4,V)],
+	[(x3,B),(x5,R)]
+
+"""
