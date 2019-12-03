@@ -1,7 +1,7 @@
 # -*-coding:Latin-1 -*
 
 #author : kleinhentz - gouth
-#algo qui résoud le problème de 3,2 SSS
+#algo qui résoud le problème de 3-COLORATION via une reduction au problème (3,2)SSS
 
 """ 
 -------------------------------------
@@ -91,7 +91,7 @@ def cas2():
 	global unaire
 	global binaire 
 	global var
-
+[[[False]*3 for _ in range(3)]]*N for _ in range(N) #2nd layer continent une matrice pour chaqu
 	for i in range (0,N):
 		if(var[i]==True):
 			b1 = (unaire[i][1]==unaire[i][2] and unaire[i][1] == True) #xi,G | xi,B
@@ -117,8 +117,56 @@ def cas2():
 								unaire[f][col_f] = True #on ajoute la contrainte unaire [y,{R,G,B}]
 					
 
-			
-
+def cas3():
+    global N
+    global unaire
+    global binaire
+    global var
+    
+    #x apparait dans une contrainte unaire dans ce cas on remplace 
+    #Enlever toutes les contraintes de la forme[(x,R),(y,·)] ou [(y,·),(x,R)]
+    #Pour tout couple de contraintes[(x,V),(y,b)]et[(x,B),(z,c)],ajouter la contrainte [(y,b),(z,c)]
+    for i in range(0,N):
+        if (var[i]): #on doit check encore la variable x_i
+            for X1 in range(0,N):
+                for col_X1 in range (0,3):
+                    if (unaire[X1][col_un]): #x apparait dans une variable unaire de couleur {R, G ou B}
+                        for X2 in range (0,N):
+                            for col_X2 in range (0,3):
+                                if(binaire[X1][X2][col_X1][col_X2]):
+                                    binaire[X1][X2][col_X1][col_X2] = False
+                                if(binaire[X2][X1][col_X2][col_X1]):
+                                    binaire[X2][X1][col_X2][col_X1] = False
+                        ###ici on a enlever toutes les contraintes de la forme[(x,R),(y,·)] ou [(y,·),(x,R)] 
+                        #fin for X2 in range (0,N):
+                        
+                        #si col_X1 = R ==> autre_couleur1 = G, autre_couleur2 = B
+                        #de meme si V ==> R et B
+                        #si B ==> R et G
+                        autre_couleur1 = (col_X1 + 1) % 3
+                        autre_couleur2 = (col_X1 + 2) % 3
+                        
+                        for Y in range (0,N):
+                            for Z in range (0,N):
+                                for color_Y in range (0,3):
+                                    for color_Z in range (0,3):
+                                        
+                                        #si [(x,R)] , b1 = true si il existe une contrainte binaire 
+                                        #[(x,V),(y,{R,G,B})] et [(x,B), (z, {R,G,B})]
+                                        
+                                        #si [(x,R)], b2 = true si il existe une contrainte binaire
+                                        #[(x,B), (y,{R,G,B})] et [(x,V), (z, {R,G,B})]
+                                        b1 = (binaire[X1][Y][autre_couleur1][color_Y] and binaire[X1][Z][autre_couleur2][color_Z])
+                                        b2 = (binaire[X1][Y][autre_couleur2][color_Y] and binaire[X1][Z][autre_couleur1][color_Z])
+                                        
+                                        
+                                        if(b1 or b2):
+                                            binaire[Y][Z][color_Y][color_Z] = True
+                                            binaire[Z][Y][color_Z][color_Y] = True
+                                            
+                                        
+                                        
+                                       
 
 def process():
 	Continue = cas1()
