@@ -203,7 +203,23 @@ def cas3():
 								
 
 def cas4():
-	pass
+	global N
+	global unaire
+	global binaire
+	global var
+
+	res = False 
+	for i in range (0,N):
+		if(var[i]):#on selectionne la premiere variable a process
+			res = True
+			for x in range (0,N):
+				for col_x in range (0,3):
+					if (unaire[x][col_x]):
+						return False
+
+			## ici on est sur qu'il n'y a plus de contrainte unaire
+			 
+	return res
 								   
 
 def process():
