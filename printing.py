@@ -8,6 +8,10 @@ def intToCol(x):
 	if x == 2:
 		return "B"
 
+
+def printConstraint(var, col):
+	print "[(x",var,",",intToCol(col),")]"
+
 def printUnaire(N, unaire):
 	print "====printing unaire=====\n"
 	for i in range(0,N):
@@ -52,15 +56,37 @@ COLOR1--> 1	[False False **True**]
 			for c1 in range (0, 3):
 				for c2 in range (0, 3):
 					if(binaire[i][j][c1][c2]):
-						print "[(x",i,",",intToCol(c1),"),(x",i,",",intToCol(c2),")]"
+						print "[(x",i,",",intToCol(c1),"),(x",j,",",intToCol(c2),")]"
 
 
 def afficherVar(N, var):
 	for i in range (0,N):
 		print "x",i ,"=",var[i]
 
+def init_default1(N, unaire):
+	### utilisé pour tester le cas 1
+	"""
+	[(x0,R)], [(x0,G)], [(x0,B)]
+	"""
 
-def init_default1(N, unaire, binaire, var):
+	unaire[0][0] = True
+	unaire[0][1] = True
+	unaire[0][2] = True
+	
+	#excpected ouput : FALSE
+
+def init_zero(N, unaire, binaire, var):
+	for i in range (0,N):
+		var[i] = True
+		unaire[i][0] = False
+		unaire[i][1] = False
+		unaire[i][2] = False
+		for j in range (0,N):
+			for col1 in range (0,3):
+				for col2 in range (0,3):
+					binaire[i][j][col1][col2] = False
+
+def init_default2(N, unaire, binaire, var):
 	### utilisé pour tester le cas 2
 	"""
 	[(x0,R)], [(x0,B)],
@@ -73,6 +99,8 @@ def init_default1(N, unaire, binaire, var):
 	[(x2,V),(x3,V)], 
 	[(x2,B),(x4,R)]
 	"""
+
+
 	unaire[0][0] = True
 	unaire[0][2] = True
 	binaire[0][1][2][0] = True
@@ -87,16 +115,20 @@ def init_default1(N, unaire, binaire, var):
 
 """
 	##output cas 2 :
-	[(x0,R)], [(x0,B)],
-	[(x1,R)], [(x2,B)], 
-	[(x2,V)], [(x4,R)],
-	[(x4,B)], [(x4,V)], 
+	[(x0,R)], 
+	[(x0,B)],
+	[(x1,R)], 
+	[(x2,B)], 
+	[(x2,V)], 
+	[(x4,R)],
+	[(x4,B)], 
+	[(x4,V)], 
 	[(x2,V),(x3,V)],
 	[(x2,B),(x4,R)]
 
 """
 
-def init_default2(N, unaire, binaire, var):
+def init_default3(N, unaire, binaire, var):
 	### utilisé pour tester le cas 3
 
 	"""

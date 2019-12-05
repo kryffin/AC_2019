@@ -109,7 +109,12 @@ def cas2():
 				for f in range (0,N): #pour toutes les variables dont le couples s'associe avec xi
 					for col_x in range(0,3): #les couleurs de X {R,G,B}
 						for col_f in range(0,3): #les couleurs f {R,G,B}
-							if(binaire[f][i][col_f][col_x] or binaire[i][f][col_x][col_f]): #si une contrainte binaire existe contenant xi								print "\tchanging x",f ," binary constraint into unary contraint..."
+							if(binaire[f][i][col_f][col_x] or binaire[i][f][col_x][col_f]): #si une contrainte binaire existe contenant xi								
+								print "\tchanging"
+								printing.printConstraint(f,col_f)
+								printing.printConstraint(i,col_x)
+								print "binary constraint into unary contraint..."
+								printing.printConstraint(f,col_f)
 								binaire[f][i][col_f][col_x] = False #on supprime les contraintes de type [(y,{R,G,B}), (x_i,{R,G,B})]
 								binaire[i][f][col_x][col_f] = False #on supprime les contraintes de type [(x_i,{R,G,B}), (y,{R,G,B})]
 								unaire[f][col_f] = True #on ajoute la contrainte unaire [y,{R,G,B}]
@@ -239,22 +244,82 @@ def process():
 	
 	print "satisfiable"
 
+def test_cas1():
+	global unaire 
+	global N
+
+	N = 1
+	printing.init_default1(N, unaire)
+	cas1()
+	printing.printUnaire(N, unaire)
+
+	unaire[0][1] = False
+	cas1()
+	printing.printUnaire(N, unaire)
+
+	print "done cas1\n"
+
+def test_cas2():
+	global N
+	global unaire
+	global binaire
+
+	N = 5 
+	printing.init_default2(N, unaire, binaire, var)
+	
+	print "before==="
+	printing.printUnaire(N, unaire)
+	printing.printBinaire(N, binaire)
+	
+	cas2()
+	
+	print "after==="
+	printing.printUnaire(N, unaire)
+	printing.printBinaire(N, binaire)
+	
+	print "done cas2\n"
+
+def test_cas3():
+	global unaire
+	global binaire
+	global N
+
+	printing.init_default3(N, unaire, binaire, var)
+	cas3()
+	printing.printUnaire(N, unaire)
+	printing.printBinaire(N, binaire)
+	print "done cas3\n"
+
+def test():
+	global unaire
+	global binaire
+	global N
+	global var
+	
+	printing.init_zero(N, unaire, binaire, var)
+	#test_cas1()
+
+	printing.init_zero(N, unaire, binaire, var)
+	#test_cas2()
+
+	printing.init_zero(N, unaire, binaire, var)
+	test_cas3()
+
+
+	
+
+
+
 def main():
 	global unaire
 	global binaire
 	global N
 	global var
 
-	print "initialisation...."
-	printing.init_default1(N, unaire, binaire, var)
-
-	print "done\n\nprocessing......"
-	process()
-
+	print "testing...."
+	test()
+	
 	print "done"
-
-	printing.printUnaire(N, unaire)
-	printing.printBinaire(N, binaire)
 
 if __name__ == "__main__":
 	# execute only if run as a script
