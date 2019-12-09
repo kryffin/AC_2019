@@ -9,6 +9,9 @@ def intToCol(x):
 		return "B"
 
 
+def printConstraintBinaire(var1, var2, col1, col2):
+	print "[(x",var1,",",intToCol(col1),"),(x",var2,",",intToCol(col2),")]"
+
 def printConstraint(var, col):
 	print "[(x",var,",",intToCol(col),")]"
 
@@ -17,7 +20,7 @@ def printUnaire(N, unaire):
 	for i in range(0,N):
 		for j in range(3):
 			if(unaire[i][j]):
-				print "[(x",i,",",intToCol(j),")]"
+				printConstraint(i,j)
 
 
 def printBinaire(N, binaire):
@@ -56,7 +59,7 @@ COLOR1--> 1	[False False **True**]
 			for c1 in range (0, 3):
 				for c2 in range (0, 3):
 					if(binaire[i][j][c1][c2]):
-						print "[(x",i,",",intToCol(c1),"),(x",j,",",intToCol(c2),")]"
+						printConstraintBinaire(i,j,c1,c2)
 
 
 def afficherVar(N, var):
@@ -161,23 +164,87 @@ def init_default3(N, unaire, binaire, var):
 	binaire[0][4][2][1] = True
 	
 
-"""
+"""excpected : en fait il y a plus de cas
+
 	##output cas 3 :
 	[(x0,R)], 
 
 	[(x0,B),(x1,R)], 
-	[(x0,V),(x2,B)],
-
 	[(x0,V),(x2,V)], 
-	[(x0,B),(x4,R)],
-	
+
+	[(x0,V),(x2,B)],
 	[(x0,V),(x4,B)], 
-	[(x0,B),(x4,V)],
 	
-new	[(x1,R)], [(x2,B)], 
+	[(x0,B),(x4,R)],
+	[(x0,B),(x4,V)],
+
+new	[(x1,R)], [(x2,V)],
+	
+new	[(x1,R)], [(x2,B)],
+
+new	[(x1,R)], [(x4,B)], 
 
 new	[(x2,V)], [(x4,R)],
 	
 new	[(x4,B)], [(x4,V)]
 
+
+got : 
+[(x 0, R)] 					V
+[(x 0 , B ),(x 1 , R )]		V
+[(x 0 , G ),(x 2 , G )]		V
+[(x 0 , G ),(x 2 , B )]		V
+[(x 0 , G ),(x 4 , B )]		V
+[(x 0 , B ),(x 4 , R )]		V
+[(x 0 , B ),(x 4 , G )]		V
+
+[(x 1 , R ),(x 2 , G )]		V
+[(x 1 , R ),(x 2 , B )]		V
+[(x 1 , R ),(x 4 , B )]		V
+[(x 2 , G ),(x 1 , R )]		V
+[(x 2 , B ),(x 1 , R )]		V
+[(x 2 , G ),(x 4 , R )]		V
+[(x 2 , G ),(x 4 , G )]		V
+[(x 2 , B ),(x 4 , R )]		V
+[(x 2 , B ),(x 4 , G )]		V
+[(x 4 , B ),(x 1 , R )]		V
+[(x 4 , R ),(x 2 , G )]		V
+[(x 4 , R ),(x 2 , B )]		V
+[(x 4 , G ),(x 2 , G )]		V
+[(x 4 , G ),(x 2 , B )]		V
+[(x 4 , R ),(x 4 , B )]		V
+[(x 4 , G ),(x 4 , B )]		V
+[(x 4 , B ),(x 4 , R )]		V
+[(x 4 , B ),(x 4 , G )]		V
+done cas3
 """
+
+def init_default4(N, unaire, binaire, var):
+	"""
+	[(x0,R),(x1,V)]
+	"""
+	binaire[0][1][0][1] = True
+
+	"""
+	on veut :
+	[(x0,R),(x1,V)],
+	[(x0,R),(x1,B)]
+
+	OU
+
+	[(x0,R),(x1,V)]
+	[(x0,R),(x1,R)],
+
+	OU
+
+	[(x0,R),(x1,V)]
+	[(x0,V),(x1,V)],
+
+	OU
+
+	[(x0,R),(x1,V)]
+	[(x0,B),(x1,V)]
+	"""
+
+def init_defaultTRUE(N, unaire, binaire, var):
+	pass

@@ -41,6 +41,7 @@ si l'algo aboutit à une contradiction, l'algo envoie NON
 import sys
 import numpy as np
 import printing
+import random
 
 
 argv = sys.argv
@@ -187,18 +188,13 @@ def cas3():
 									b1 = (binaire[i][Y][autre_couleur1][color_Y] and binaire[i][Z][autre_couleur2][color_Z])
 									b2 = (binaire[i][Y][autre_couleur2][color_Y] and binaire[i][Z][autre_couleur1][color_Z])
 									
-									#######################
-									#
-									#	NE VRAIMENT PAS ENLEVER LA CONTRAINTE 
-									#	[(x,B), (y,{R,G,B})] et [(x,V), (z, {R,G,B})] 
-									# 
-									#	????
-									#
-									#######################
-									if(b1 or b2):
+									
+									if(b1):
 										print "\tadding constraint where x", Y,", ", printing.intToCol(color_Y), " and x", Z," ,", printing.intToCol(color_Z),"...."
 										binaire[Y][Z][color_Y][color_Z] = True
-										binaire[Z][Y][color_Z][color_Y] = True
+									if(b2):
+										print "\tadding constraint where x", Y,", ", printing.intToCol(color_Y), " and x", Z," ,", printing.intToCol(color_Z),"...."
+										binaire[Y][Z][color_Y][color_Z] = True
 
 			print "removing x",i,"from variables"
 			var[i] = False #on enlève x_i des variables à process
@@ -216,14 +212,46 @@ def cas4():
 	res = False 
 	for i in range (0,N):
 		if(var[i]):#on selectionne la premiere variable a process
+			var[i] = False
 			res = True
 			for x in range (0,N):
 				for col_x in range (0,3):
 					if (unaire[x][col_x]):
 						return False
 
+			print "aucunes variable unaire\ntirage..."
 			## ici on est sur qu'il n'y a plus de contrainte unaire
-			 
+			tirage=random.randint(1,4) #tirage aléatoire on pose une equiproba, (i.e) 1/4 pour tomber sur 1 V 2 V 3 V 4
+			#print "==========DEBUG==============="
+			#printing.printBinaire(N, binaire)
+
+			for col_X in range (0,3):
+				for Y in range (0, N):
+					for col_Y in range (0,3):
+						#print "===+DEBUG+===" , printing.printConstraintBinaire(i, Y, col_x, col_Y)
+						if (binaire[i][Y][col_X][col_Y] and i != Y): #premiere contrainte binaire rencontrée
+							
+							print "finding the first binary constraint" , printing.printConstraintBinaire(i,Y,col_x,col_Y)
+							printing.printConstraint(i,col_x)
+							var[Y] = False
+
+							autre_couleur1_X = (col_X + 1) % 3
+							autre_couleur2_X = (col_X + 2) % 3
+
+							autre_couleur1_Y = (col_Y + 1) % 3
+							autre_couleur2_Y = (col_Y + 2) % 3
+							#on effectue le tirage
+							if(tirage == 1):
+								binaire[i][Y][col_X][autre_couleur1_Y] = True
+							if(tirage == 2):
+								binaire[i][Y][col_X][autre_couleur2_Y] = True
+							if(tirage == 3):
+								binaire[i][Y][autre_couleur1_X][col_Y] = True
+							if(tirage == 4):
+								binaire[i][Y][autre_couleur2_X][col_Y] = True
+
+							print "added new constraint successfully"
+							return True
 	return res
 								   
 
@@ -283,6 +311,7 @@ def test_cas3():
 	global unaire
 	global binaire
 	global N
+	global var
 
 	printing.init_default3(N, unaire, binaire, var)
 	cas3()
@@ -290,12 +319,27 @@ def test_cas3():
 	printing.printBinaire(N, binaire)
 	print "done cas3\n"
 
+
+def test_cas4():
+	global unaire
+	global binaire
+	global N
+	global var
+
+	printing.init_default4(N, unaire, binaire, var)
+	cas4()
+	printing.printUnaire(N, unaire)
+	printing.printBinaire(N, binaire)
+	print "done cas4\n"
+
+
 def test():
 	global unaire
 	global binaire
 	global N
 	global var
-	
+
+
 	printing.init_zero(N, unaire, binaire, var)
 	#test_cas1()
 
@@ -303,7 +347,10 @@ def test():
 	#test_cas2()
 
 	printing.init_zero(N, unaire, binaire, var)
-	test_cas3()
+	#test_cas3()
+
+	printing.init_zero(N, unaire, binaire, var)
+	test_cas4()
 
 
 	
@@ -317,8 +364,9 @@ def main():
 	global var
 
 	print "testing...."
-	test()
-	
+	#test()
+	printing.init_default2(N, unaire, binaire, var)
+	process()
 	print "done"
 
 if __name__ == "__main__":
