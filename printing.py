@@ -119,13 +119,9 @@ def init_default2(N, unaire, binaire, var):
 """
 	##output cas 2 :
 	[(x0,R)], 
-	[(x0,B)],
-	[(x1,R)], 
-	[(x2,B)], 
+	[(x0,B)], 
 	[(x2,V)], 
-	[(x4,R)],
-	[(x4,B)], 
-	[(x4,V)], 
+	[(x4,B)],  
 	[(x2,V),(x3,V)],
 	[(x2,B),(x4,R)]
 

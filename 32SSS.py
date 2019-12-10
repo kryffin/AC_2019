@@ -100,25 +100,62 @@ def cas2():
 	print "\n\t==initalize case 2 ...==\n"
 	for i in range (0,N):
 		if(var[i]==True):
-			b1 = (unaire[i][1]==unaire[i][2] and unaire[i][1] == True) #xi,G | xi,B
-			b2 = (unaire[i][0]==unaire[i][1] and unaire[i][0] == True) #xi,R | xi,G 
-			b3 = (unaire[i][0]==unaire[i][2] and unaire[i][0] == True) #xi,R | xi,B
+			b = [[False] *3 for _ in range(3)] #pour récuperer les couleurs 
+			tmpcol1 = 0
+			tmpcol2 = 0
+			for color_1 in range (0,3):
+				for color_2 in range (0,3):
+					if(unaire[i][color_1][color_2] or unaire[i][color_2][color_1]):
+						b[color_1][color_2] = True
+						b[color_2][color_1] = True
+						tmpcol1=color_1
+						tmpcol2=color_2
 
-			if(b1 or b2 or b3): #si x_i apparait dans deux contraintes unaires
+			b1 = (unaire[i][color_1] and unaire[i][color_2]) 
+			b2 = (unaire[i][color_2] and unaire[i][color_1])  
+			
+			if(b1 or b2): #si x_i apparait dans deux contraintes unaires
 				res = True #le cas2 a fonctionné on renverra True
+
+				#recuperation de la troisième couleur qui n'apparait pas dans les deux contraintes unaires
+				for tmp in range(0,3):
+					if((tmp != color_1) and (tmp != color_2)):
+						other_color = tmp
+						break
+				#recuperation des couleurs des deux contraintes unaires
 				print "\nx", i," appareas to be in two unary constraint...."
 				for f in range (0,N): #pour toutes les variables dont le couples s'associe avec xi
-					for col_x in range(0,3): #les couleurs de X {R,G,B}
-						for col_f in range(0,3): #les couleurs f {R,G,B}
-							if(binaire[f][i][col_f][col_x] or binaire[i][f][col_x][col_f]): #si une contrainte binaire existe contenant xi								
-								print "\tchanging"
-								printing.printConstraint(f,col_f)
-								printing.printConstraint(i,col_x)
-								print "binary constraint into unary contraint..."
-								printing.printConstraint(f,col_f)
-								binaire[f][i][col_f][col_x] = False #on supprime les contraintes de type [(y,{R,G,B}), (x_i,{R,G,B})]
-								binaire[i][f][col_x][col_f] = False #on supprime les contraintes de type [(x_i,{R,G,B}), (y,{R,G,B})]
-								unaire[f][col_f] = True #on ajoute la contrainte unaire [y,{R,G,B}]
+					for col_f in range(0,3): #les couleurs f {R,G,B}
+
+						#ici on va enlever les contraintes binaire ou x apparait ayant la meme contrainte qu'une des deux contraintes unaires
+						bo1 = binaire[f][i][col_f][color_1] or binaire[f][i][col_f][color_2]
+						bo2 = binaire[i][f][color_1][col_f] or binaire[i][f][color_2][col_f]
+
+						if(bo1): #si une contrainte binaire existe contenant xi et une des deux contraintes								
+							print "\terase"
+							if(binaire[f][i][col_f][color_1]):
+								printing.printConstraintBinaire(f,i,col_f,color_1)
+								binaire[f][i][col_f][color_1] = False #on supprime les contraintes ou xi apparait 
+							if(binaire[f][i][col_f][color_2]):
+								printing.printConstraintBinaire(f,i,col_f,color_2)
+								binaire[f][i][col_f][color_2] = False #on supprime les contraintes ou xi apparait 
+
+						if(bo2):
+							print "\terase"
+							if(binaire[i][f][color_1][col_f]):
+								printing.printConstraintBinaire(i, f, color_1, col_f)
+								binaire[i][f][color_1][col_f] = False #on supprime les contraintes ou xi apparait 
+							if(binaire[i][f][color_2][col_f]):
+								printing.printConstraintBinaire(i, f, color_2, col_f)
+								binaire[i][f][color_2][col_f] = False #on supprime les contraintes ou xi apparait 
+							
+						
+						bo3 = binaire[i][f][other_color][col_f] or binaire[f][i][col_f][other_color]
+
+						if(bo3):
+							print "adding.."
+							printing.printUnaire(f, col_f)
+							unaire[f][col_f] = True #on ajoute la contrainte unaire [y,{R,G,B}]
 
 			print "removing x",i,"from variables"
 			var[i] = False #on enlève x_i des variables à process
